@@ -1,0 +1,13 @@
+[project]
+name = "jd-scanner"
+version = "0.0.1"
+description = "test-version with ai prompt"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.13.4",
+    "langchain>=0.3.25",
+    "langchain-community>=0.3.24",
+    "langchain-ollama>=0.3.3",
+    "pip>=25.1.1",
+]

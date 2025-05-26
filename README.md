@@ -38,7 +38,7 @@ Recommend Python Version : 3.11.12
 프로젝트 클론
 ```bash
 git clone https://github.com/HelloPy-Korea/JD-Scanner.git && \
-cd job-posting-summarizer
+cd JD-Scanner
 ```
 
 프로젝트 의존설치

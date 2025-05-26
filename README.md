@@ -29,40 +29,27 @@
 ## 🚀 설치 및 실행
 
 ### 1. 사전 준비
-본 프로젝트는 uv가 설치되어 있는 기준으로 합니다.  
-Python Version : 3.11.12  
-Ollama와 llama3.2 모델이 설치되어 있어야 합니다:  
-
-```bash
-# Ollama 설치 (macOS/Linux)
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# llama3.2 모델 다운로드
-ollama pull llama3.2
-```
+본 프로젝트는 python이 설치되어 있어야합니다.  
+Recommend Python Version : 3.11.12   
+  
 
 ### 2. 프로젝트 설정
 
+프로젝트 클론
 ```bash
-# 프로젝트 클론
-git clone https://github.com/HelloPy-Korea/JD-Scanner.git
+git clone https://github.com/HelloPy-Korea/JD-Scanner.git && \
 cd job-posting-summarizer
+```
 
-# uv로 의존성 설치
-uv sync
-
-# 또는 pip로 설치
-pip install -e .
+프로젝트 의존설치
+```bash
+make install
 ```
 
 ### 3. 실행
 
 ```bash
-# uv 환경에서 실행
-uv run python main.py
-
-# 또는 직접 실행
-python main.py
+make run
 ```
 
 ## 💡 사용 방법

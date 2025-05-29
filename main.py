@@ -114,12 +114,13 @@ def main():
         # 요약 수행
         print("🤖 AI 요약 처리 중... (시간이 조금 걸릴 수 있습니다)")
         summary = summarizer.summarize_job_posting(content)
-        
+        summary = f"{summary}  \n[채용공고]({url})"
         # 결과 출력
         print("\n" + "=" * 50)
         print("📋 요약 결과:")
         print("=" * 50)
         print(summary)
+        
         
         # 파일 저장
         print("\n💾 결과 저장 중...")

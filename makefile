@@ -25,6 +25,9 @@ else
 	@echo "❌ 지원하지 않는 운영체제입니다."
 	@exit 1
 endif
+	@echo "ollama 서버 구동"
+	@ollama serve &
+	@sleep 5
 	@echo "✅ Ollama 설치 성공. 모델을 다운로드합니다..."
 	@ollama pull llama3.2
 	@echo "✅ Ollama 모델 다운로드 완료."

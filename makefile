@@ -18,6 +18,7 @@ ifeq ($(OS), Darwin)
 	@brew install ollama
 else ifeq ($(OS), Linux)
 	@echo "Detected Linux or others"
+	@sudo apt install -y curl
 	@curl -fsSL https://ollama.ai/install.sh | sh && command -v ollama >/dev/null || ( \
 		echo "❌ Ollama 설치에 실패했습니다. [문의페이지](https://github.com/HelloPy-Korea/JD-Scanner/issues) issue 등록해 주세요." && exit 1 \
 	)

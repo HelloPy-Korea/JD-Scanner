@@ -7,7 +7,7 @@ from langchain_core.prompts import PromptTemplate
 
 class JobSummaryTemplate:
     """채용공고 요약용 프롬프트 템플릿 클래스"""
-    
+
     @staticmethod
     def get_summary_template() -> PromptTemplate:
         """채용공고 요약용 프롬프트 템플릿 반환"""
@@ -17,7 +17,8 @@ class JobSummaryTemplate:
 
 아래 형식으로 정리해주세요:
 
-## 회사명: [회사명]
+## 공고명: [공고명]
+### 회사명: [회사명]
 
 **마감기한**
 - [마감기한]
@@ -35,11 +36,8 @@ class JobSummaryTemplate:
 ### C. 혜택 및 복지 & 기타사항:
 - [혜택, 복지, 기타 정보들]
 """
-        return PromptTemplate(
-            input_variables=["job_content"],
-            template=template
-        )
-    
+        return PromptTemplate(input_variables=["job_content"], template=template)
+
     @staticmethod
     def get_custom_template(custom_format: str) -> PromptTemplate:
         """커스텀 포맷의 프롬프트 템플릿 반환"""
@@ -49,7 +47,4 @@ class JobSummaryTemplate:
 
 {custom_format}
 """
-        return PromptTemplate(
-            input_variables=["job_content"],
-            template=template
-        )
+        return PromptTemplate(input_variables=["job_content"], template=template)

@@ -5,21 +5,26 @@ import sys
 from dotenv import load_dotenv
 from pathlib import Path
 
+
 class SimpleDiscordSender:
     def __init__(self, message):
         # .env 로드
-        env_path = Path(__file__).parent.parent / '.env'
+        env_path = Path(__file__).parent.parent / ".env"
         load_dotenv(env_path)
 
         self.token = os.getenv("DISCORD_BOT_TOKEN")
         self.channel_ids_str = os.getenv("DISCORD_CHANNEL_IDS")
 
         if not self.token:
-            print("❌ DISCORD_BOT_TOKEN이 설정되지 않았습니다. \n .env를 확인하고 토큰 값을 입력하세요.")
+            print(
+                "❌ DISCORD_BOT_TOKEN이 설정되지 않았습니다. \n .env를 확인하고 토큰 값을 입력하세요."
+            )
             sys.exit(1)
 
         if not self.channel_ids_str:
-            print("❌ DISCORD_CHANNEL_IDS가 설정되지 않았습니다. \n .env를 확인하고 채널 IDS를 입력해주세요.")
+            print(
+                "❌ DISCORD_CHANNEL_IDS가 설정되지 않았습니다. \n .env를 확인하고 채널 IDS를 입력해주세요."
+            )
             sys.exit(1)
 
         self.channel_ids = self.parse_channel_ids()
@@ -38,7 +43,7 @@ class SimpleDiscordSender:
     def parse_channel_ids(self):
         """환경변수에서 채널 ID 문자열을 리스트로 파싱"""
         # env에 여러 채널 id를 입력시 ","로 구분
-        raw_ids = self.channel_ids_str.split(",") # type: ignore
+        raw_ids = self.channel_ids_str.split(",")  # type: ignore
         channel_ids = []
 
         for raw_id in raw_ids:
@@ -61,10 +66,10 @@ class SimpleDiscordSender:
         for channel_id in self.channel_ids:
             try:
                 channel = await self.client.fetch_channel(channel_id)
-                await channel.send(content) # type: ignore
+                await channel.send(content)  # type: ignore
                 print(f"📨 메시지 전송 완료: 채널 {channel_id}")
             except Exception as e:
                 print(f"❌ 채널 {channel_id} 전송 실패: {e}")
 
     def run(self):
-        self.client.run(self.token) # type: ignore
+        self.client.run(self.token)  # type: ignore

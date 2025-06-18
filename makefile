@@ -55,5 +55,7 @@ setup-project:
 .PHONY: install check-ollama install-ollama check-uv install-uv setup-project
 
 run:
+	@echo "ollama 실행합니다."
+	@nohup ollama serve &
 	@echo "JD-Scanner를 실행합니다."
 	@uv run main.py

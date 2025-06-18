@@ -45,6 +45,26 @@ cd JD-Scanner
 ```bash
 make install
 ```
+Discord 봇 설정  
+[discord developer](https://discord.com/developers/applications) 접속 후  
+OAuth2 탭에 들어가서  
+OAuth2 URL Generator 탭에서 "bot"을 선택  
+이후 다음의 권한을 허용합니다.  
+"Send Messages"
+
+Discord에 메시지 보내기 설정
+.env 안에 DISCORD_BOT_TOKEN, DISCORD_CHANNEL_IDS 를 각각 입력해줍니다.  
+
+> DISCORD_BOT_TOKEN 입력 방법 
+1. [discord developer](https://discord.com/developers/applications)에 접속하여 해당 봇에 접속 
+2. Bots 탭에 들어갑니다.
+3. Reset Token 버튼을 클릭 후 토큰을 Copy 합니다.
+4. .env 파일의 "DISCORD_BOT_TOKEN"값 입력해줍니다.
+
+> DISCORD_CHANNEL_IDS 입력 방법
+1. 디스코드 방의 채널 명을 우클릭합니다.
+2. "채널 ID 복사하기"를 클릭합니다.
+3. .env 파일의 "DISCORD_CHANNEL_IDS"값 입력해줍니다.
 
 ### 3. 실행
 

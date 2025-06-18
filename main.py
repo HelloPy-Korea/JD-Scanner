@@ -12,6 +12,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.chain import JobSummaryChain
+from src.discord_sender import SimpleDiscordSender
 
 
 class JobPostingSummarizer:
@@ -115,6 +116,9 @@ def main():
         print("🤖 AI 요약 처리 중... (시간이 조금 걸릴 수 있습니다)")
         summary = summarizer.summarize_job_posting(content)
         summary = f"{summary}  \n[채용공고]({url})"
+        
+        sender = SimpleDiscordSender(summary)
+        sender.run()
         # 결과 출력
         print("\n" + "=" * 50)
         print("📋 요약 결과:")

@@ -4,6 +4,9 @@ install:
 	@$(MAKE) check-ollama
 	@$(MAKE) check-uv
 	@$(MAKE) setup-project
+	@touch .env
+	@echo 'DISCORD_BOT_TOKEN=여기에_봇_토큰_붙여넣기' >> .env
+	@echo 'DISCORD_CHANNEL_IDS=여기에 채널 ID 붙여넣기' >> .env
 
 check-ollama:
 	@echo "ollama 설치 여부 확인 중"

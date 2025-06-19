@@ -56,6 +56,7 @@ class JobPostingSummarizer:
 
     def summarize_job_posting(self, content: str) -> str:
         """채용공고 내용 요약"""
+        # 수정 요소 전체 내용을 분리해서 추출이 필요할 수 있음 채용공고가 너무 긴 경우
         try:
             # 내용이 너무 길면 앞부분만 사용 (토큰 제한 고려)
             if len(content) > 8000:

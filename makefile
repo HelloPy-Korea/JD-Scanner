@@ -59,3 +59,11 @@ run:
 	@nohup ollama serve &
 	@echo "JD-Scanner를 실행합니다."
 	@uv run main.py
+	@echo "ollama를 종료하시겠습니까? (y/n)"; \
+	read answer; \
+	if [ "$$answer" = "y" ] || [ "$$answer" = "Y" ]; then \
+		echo "ollama를 종료합니다."; \
+		ollama stop llama3.2;
+	else \
+		echo "ollama를 종료하지 않고 종료합니다."; \
+	fi

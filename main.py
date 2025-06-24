@@ -54,15 +54,10 @@ class JobPostingSummarizer:
         except Exception as e:
             raise Exception(f"내용 추출 실패: {e}")
 
-    def summarize_job_posting(self, content: str) -> str:
-        """채용공고 내용 요약"""
-        # 수정 요소 전체 내용을 분리해서 추출이 필요할 수 있음 채용공고가 너무 긴 경우
+    def summarize_job_posting(self, content: str, verbose: bool = False) -> str:
+        """채용공고 내용 요약 (토큰 제한 자동 처리)"""
         try:
-            # 내용이 너무 길면 앞부분만 사용 (토큰 제한 고려)
-            if len(content) > 8000:
-                content = content[:8000] + "..."
-
-            result = self.chain.run_summary(content)
+            result = self.chain.run_summary(content, verbose=verbose)
             return result
         except Exception as e:
             raise Exception(f"요약 처리 실패: {e}")
@@ -115,7 +110,8 @@ def main():
 
         # 요약 수행
         print("🤖 AI 요약 처리 중... (시간이 조금 걸릴 수 있습니다)")
-        summary = summarizer.summarize_job_posting(content)
+        summary = summarizer.summarize_job_posting(content, verbose=True)
+        summary = f"# test 결과입니다. \n {summary}"
         summary = f"{summary}  \n[채용공고]({url})"
 
         sender = SimpleDiscordSender(summary)

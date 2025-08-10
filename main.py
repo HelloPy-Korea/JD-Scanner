@@ -16,14 +16,14 @@ from src.discord_sender import SimpleDiscordSender
 
 
 class JobPostingSummarizer:
-    def __init__(self, model_name: str = "llama3.2"):
+    def __init__(self, model_name: str = "gpt-oss:20b"):
         """채용공고 요약기 초기화"""
         self.chain = JobSummaryChain(model_name)
 
     def extract_content_from_url(self, url: str) -> str:
         """URL에서 채용공고 내용 추출"""
         try:
-            # User-Agent 헤더 추가 (일부 사이트에서 봇 차단 방지)
+            # User-Agent 헤더 추가
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
             }
@@ -111,7 +111,6 @@ def main():
         # 요약 수행
         print("🤖 AI 요약 처리 중... (시간이 조금 걸릴 수 있습니다)")
         summary = summarizer.summarize_job_posting(content, verbose=True)
-        summary = f"# test 결과입니다. \n {summary}"
         summary = f"{summary}  \n[채용공고]({url})"
 
         sender = SimpleDiscordSender(summary)

@@ -17,7 +17,7 @@ class MapReduceJobChain:
     
     def __init__(
         self,
-        model_name: str = "llama3.2",
+        model_name: str = "gpt-oss:20b",
         temperature: float = 0.1,
         chunk_size: int = 3000,
         chunk_overlap: int = 200,

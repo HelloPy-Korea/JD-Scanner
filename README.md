@@ -22,7 +22,7 @@
 ## ⚙️ 기술 스택
 
 - **LLM 프레임워크**: LangChain + langchain-community  
-- **LLM 모델**: Ollama (llama3.2)  
+- **LLM 모델**: Ollama (기본: gpt-oss:20b)  
 - **웹 스크래핑**: requests + BeautifulSoup4  
 - **패키지 관리**: uv  
 
@@ -68,16 +68,42 @@ Discord에 메시지 보내기 설정
 
 ### 3. 실행
 
+- 인터랙티브 실행(기존 방식)
+
 ```bash
 make run
 ```
 
+- CLI 옵션으로 실행
+
+```bash
+# 기본 실행(모델/온도 기본값 사용)
+uv run main.py --url "https://example.com/job-posting"
+
+# 모델/온도 지정
+uv run main.py --url "https://example.com/jd" --model gpt-oss:20b --temperature 0.2
+
+# Discord 전송 활성화(옵션)
+uv run main.py --url "https://example.com/jd" --discord
+
+# 상세 로그 출력
+uv run main.py --url "https://example.com/jd" --verbose
+```
+
+환경변수로도 설정할 수 있습니다.
+
+```bash
+# .env 또는 셸 환경 (기본값은 gpt-oss:20b)
+MODEL_NAME=gpt-oss:20b
+TEMPERATURE=0.1
+DISCORD_ENABLED=false   # true로 설정 시 기본 전송 활성화
+```
+
 ## 💡 사용 방법
 
-1. 프로그램 실행  
-2. 채용공고 URL 입력  
-3. AI 요약 처리 대기 (1-2분 소요)  
-4. 결과 확인 및 파일 저장 완료  
+- 인터랙티브: 프로그램 실행 후 URL 입력 → 요약 → 파일 저장
+- CLI: `--url`로 바로 실행, 필요 시 `--discord`로 디스코드 전송
+- 디스코드 전송은 기본 비활성화이며, 2000자 초과 메시지는 자동 분할 전송됩니다.
 
 ### 예시
 
@@ -100,24 +126,33 @@ make run
 - 2010년 설립된 핀테크 스타트업으로...  
   
 💾 결과 저장 중...  
-✅ 저장 완료: output/job_posting_20241122_143052.md  
+✅ 저장 완료: output/job_posting_{회사}_{공고명}_{YYYYMMDD_HHMMSS}.md  
 ```
+
+원문 HTML과 정제 텍스트는 디버깅을 위해 `output/raw/`에도 캐시됩니다.
 
 ## 📁 프로젝트 구조
 
 ```
 job-posting-summarizer/
-├── main.py              # 메인 실행 파일
+├── main.py              # 메인 실행 파일(CLI 옵션, 로깅, 캐시)
 ├── pyproject.toml       # uv 프로젝트 설정
-├── README.md           # 프로젝트 가이드
-├── uv.lock             # uv 잠금 파일
-├── src/                # 소스 코드 모듈
-│   ├── __init__.py     # 패키지 초기화
-│   ├── chain.py        # LangChain 체인 관리
-│   ├── lang_prompt.py  # 프롬프트 설정 관리
-│   └── lang_template.py # 프롬프트 템플릿 정의
-└── output/             # 요약 결과 저장 폴더
-    └── job_posting_*.md
+├── README.md            # 프로젝트 가이드
+├── uv.lock              # uv 잠금 파일
+├── src/                 # 소스 코드 모듈
+│   ├── __init__.py      # 패키지 초기화
+│   ├── chain.py         # LangChain 체인 관리
+│   ├── lang_prompt.py   # 프롬프트 설정 관리
+│   ├── lang_template.py # 프롬프트 템플릿 정의
+│   ├── mapreduce_chain.py # 대용량 처리(Map-Reduce)
+│   ├── text_splitter.py   # 텍스트 청킹/오버랩
+│   ├── token_counter.py   # 토큰 추정/검증
+│   └── discord_sender.py  # Discord 전송(자동 분할)
+└── output/              # 결과/캐시 저장 폴더
+    ├── job_posting_*.md
+    └── raw/             # 원문/정제 텍스트 캐시
+        ├── {hash}_{timestamp}.html
+        └── {hash}_{timestamp}.txt
 ```
 
 ## 🏗️ 모듈 구조
@@ -135,12 +170,12 @@ job-posting-summarizer/
 - Ollama LLM 초기화 및 체인 실행  
 
 ### `main.py`
-- 메인 실행 로직  
-- URL 스크래핑 및 파일 저장  
+- 메인 실행 로직 및 CLI 옵션 처리  
+- URL 스크래핑(재시도/백오프) + 파일 저장/원문 캐시  
 
 ### JobSummaryChain 클래스 옵션
 
-- `model_name`: 사용할 Ollama 모델명 (기본값: "llama3.2")  
+- `model_name`: 사용할 Ollama 모델명 (기본값: "gpt-oss:20b")  
 - `temperature`: LLM 창의성 설정 (기본값: 0.1, 범위: 0.0~1.0)  
 
 ### 커스터마이징
@@ -166,6 +201,7 @@ custom_chain = chain.create_custom_chain(template)
 - 일부 웹사이트는 봇 차단으로 접근이 제한될 수 있습니다  
 - 큰 페이지의 경우 처리 시간이 오래 걸릴 수 있습니다  
 - 네트워크 연결이 필요합니다  
+- Discord 전송은 선택 기능이며, .env의 토큰/채널이 없으면 전송을 생략하고 프로그램은 계속 진행합니다.  
 
 ## 🐛 문제 해결
 
@@ -180,13 +216,14 @@ ollama serve
 
 ### 모델 다운로드 오류
 ```bash
-# 모델 재다운로드
-ollama pull llama3.2
+# 모델 재다운로드 (기본 모델)
+ollama pull gpt-oss:20b
 ```
 
 ## 📈 향후 개발 계획
-- Discord 전송 기능  
-- 현업 의견 수집 파이프라인 구축  
+- 구조화 JSON 출력 + Pydantic 검증  
+- 본문 추출 폴백(trafilatura/readability) 및 도메인별 규칙  
+- 간단 유닛 테스트/CI 파이프라인 추가  
 
 
 ## 📄 라이선스

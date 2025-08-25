@@ -15,12 +15,12 @@ from .token_counter import SimpleTokenCounter, ContentPreprocessor
 class JobSummaryChain:
     """채용공고 요약을 위한 LangChain 관리 클래스"""
 
-    def __init__(self, model_name: str = "llama3.2", temperature: float = 0.1, max_tokens: int = 2048):
+    def __init__(self, model_name: str = "gpt-oss:20b", temperature: float = 0.1, max_tokens: int = 2048):
         """
         체인 초기화
 
         Args:
-            model_name: 사용할 Ollama 모델명
+            model_name: 사용할 Ollama 모델명 (기본: gpt-oss:20b)
             temperature: LLM 온도 설정 (0.0 ~ 1.0)
             max_tokens: 최대 토큰 제한
         """

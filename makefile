@@ -33,7 +33,7 @@ endif
 	@ollama serve &
 	@sleep 5
 	@echo "✅ Ollama 설치 성공. 모델을 다운로드합니다..."
-	@ollama pull llama3.2
+	@ollama pull gpt-oss:20b || true
 	@echo "✅ Ollama 모델 다운로드 완료."
 
 check-uv:
@@ -63,7 +63,7 @@ run:
 	read answer; \
 	if [ "$$answer" = "y" ] || [ "$$answer" = "Y" ]; then \
 		echo "ollama를 종료합니다."; \
-		ollama stop llama3.2;
+		ollama stop gpt-oss:20b;
 	else \
 		echo "ollama를 종료하지 않고 종료합니다."; \
 	fi

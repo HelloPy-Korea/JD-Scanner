@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 """
-LangChain 기반 채용공고 요약 시스템 - MVP
-개선 사항:
-- CLI 옵션 도입, 환경변수 기반 구성(MODEL_NAME, TEMPERATURE, DISCORD_ENABLED)
-- 로깅 표준화
-- 스크래핑 재시도/백오프 + 원문/정제 텍스트 캐시(output/raw)
-- Discord 전송은 옵션화(--discord) 및 메시지 분할은 sender에서 처리
+LangChain 기반 채용공고 요약 시스템
 """
 
 import sys
@@ -95,7 +90,9 @@ class JobPostingSummarizer:
                 ts = datetime.now().strftime("%Y%m%d_%H%M%S")
                 with open(output_raw / f"{url_hash}_{ts}.html", "wb") as f_html:
                     f_html.write(response.content)
-                with open(output_raw / f"{url_hash}_{ts}.txt", "w", encoding="utf-8") as f_txt:
+                with open(
+                    output_raw / f"{url_hash}_{ts}.txt", "w", encoding="utf-8"
+                ) as f_txt:
                     f_txt.write(content)
             except Exception as cache_err:
                 LOGGER.debug(f"원문 캐시 저장 실패: {cache_err}")
@@ -140,9 +137,13 @@ class JobPostingSummarizer:
         company = ""
         for line in summary.splitlines():
             txt = line.strip()
-            if not title and (txt.startswith("## 공고명:") or txt.startswith("## 공고명 :")):
+            if not title and (
+                txt.startswith("## 공고명:") or txt.startswith("## 공고명 :")
+            ):
                 title = txt.split(":", 1)[-1].strip()
-            if not company and (txt.startswith("### 회사명:") or txt.startswith("### 회사명 :")):
+            if not company and (
+                txt.startswith("### 회사명:") or txt.startswith("### 회사명 :")
+            ):
                 company = txt.split(":", 1)[-1].strip()
             if title and company:
                 break
@@ -162,9 +163,21 @@ def main():
     """메인 함수"""
     parser = argparse.ArgumentParser(description="JD-Scanner: 채용공고 요약기")
     parser.add_argument("--url", help="채용공고 URL")
-    parser.add_argument("--model", default=os.getenv("MODEL_NAME", "gpt-oss:20b"), help="Ollama 모델명")
-    parser.add_argument("--temperature", type=float, default=float(os.getenv("TEMPERATURE", "0.1")), help="LLM temperature")
-    parser.add_argument("--discord", action="store_true", default=(os.getenv("DISCORD_ENABLED", "false").lower() == "true"), help="Discord 전송 활성화")
+    parser.add_argument(
+        "--model", default=os.getenv("MODEL_NAME", "gpt-oss:20b"), help="Ollama 모델명"
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=float(os.getenv("TEMPERATURE", "0.1")),
+        help="LLM temperature",
+    )
+    parser.add_argument(
+        "--discord",
+        action="store_true",
+        default=(os.getenv("DISCORD_ENABLED", "false").lower() == "true"),
+        help="Discord 전송 활성화",
+    )
     parser.add_argument("--verbose", action="store_true", help="자세한 로그 출력")
     args = parser.parse_args()
 
@@ -188,7 +201,9 @@ def main():
     try:
         # 요약기 초기화
         print("🔧 시스템 초기화 중...")
-        summarizer = JobPostingSummarizer(model_name=args.model, temperature=args.temperature)
+        summarizer = JobPostingSummarizer(
+            model_name=args.model, temperature=args.temperature
+        )
 
         # 내용 추출
         print("📄 채용공고 내용 추출 중...")
@@ -205,7 +220,9 @@ def main():
             sender = SimpleDiscordSender(summary)
             sender.run()
         else:
-            LOGGER.info("Discord 전송 비활성화 상태입니다. --discord 플래그 또는 DISCORD_ENABLED=true 설정 시 전송합니다.")
+            LOGGER.info(
+                "Discord 전송 비활성화 상태입니다. --discord 플래그 또는 DISCORD_ENABLED=true 설정 시 전송합니다."
+            )
 
         # 결과 출력
         print("\n" + "=" * 50)

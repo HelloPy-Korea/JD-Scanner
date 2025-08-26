@@ -1,7 +1,7 @@
 [project]
 name = "jd-scanner"
 version = "0.0.2"
-description = "test-version with ai prompt"
+description = "- CLI 옵션 도입, 환경변수 기반 구성(MODEL_NAME, TEMPERATURE, DISCORD_ENABLED) - 로깅 표준화 - 스크래핑 재시도/백오프 + 원문/정제 텍스트 캐시(output/raw) - Discord 전송은 옵션화(--discord) 및 메시지 분할은 sender에서 처리"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

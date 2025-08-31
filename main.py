@@ -17,9 +17,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 
-from src.chain import JobSummaryChain
-from src.discord_sender import SimpleDiscordSender
-
+from src.langchain.chain import JobSummaryChain
+from src.discord.discord_sender import SimpleDiscordSender
+from src.parser.parser_bot import WebParser
 
 LOGGER = logging.getLogger("jd_scanner")
 
@@ -38,71 +38,13 @@ def _slugify(value: str, max_length: int = 80) -> str:
     return slug[:max_length] or "job_posting"
 
 
-def _build_requests_session() -> requests.Session:
-    session = requests.Session()
-    retries = Retry(
-        total=4,
-        backoff_factor=0.8,
-        status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET", "HEAD"],
-        raise_on_status=False,
-    )
-    adapter = HTTPAdapter(max_retries=retries, pool_connections=10, pool_maxsize=10)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
-    return session
-
-
 class JobPostingSummarizer:
-    def __init__(self, model_name: str = "gpt-oss:20b", temperature: float = 0.1):
+    def __init__(
+        self, content: str, model_name: str = "gpt-oss:20b", temperature: float = 0.1
+    ):
         """채용공고 요약기 초기화"""
         self.chain = JobSummaryChain(model_name=model_name, temperature=temperature)
-        self.session = _build_requests_session()
-
-    def extract_content_from_url(self, url: str) -> str:
-        """URL에서 채용공고 내용 추출"""
-        try:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-            }
-
-            response = self.session.get(url, headers=headers, timeout=25)
-            response.raise_for_status()
-
-            soup = BeautifulSoup(response.content, "html.parser")
-
-            for script in soup(["script", "style"]):
-                script.decompose()
-
-            text = soup.get_text()
-            lines = (line.strip() for line in text.splitlines())
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            content = " ".join(chunk for chunk in chunks if chunk)
-
-            if not content.strip():
-                raise ValueError("추출된 내용이 비어있습니다.")
-
-            # 원문/정제 텍스트 캐시 저장
-            try:
-                output_raw = Path("output/raw")
-                output_raw.mkdir(parents=True, exist_ok=True)
-                url_hash = hashlib.sha1(url.encode("utf-8")).hexdigest()[:10]
-                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-                with open(output_raw / f"{url_hash}_{ts}.html", "wb") as f_html:
-                    f_html.write(response.content)
-                with open(
-                    output_raw / f"{url_hash}_{ts}.txt", "w", encoding="utf-8"
-                ) as f_txt:
-                    f_txt.write(content)
-            except Exception as cache_err:
-                LOGGER.debug(f"원문 캐시 저장 실패: {cache_err}")
-
-            return content
-
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"URL 요청 실패: {e}")
-        except Exception as e:
-            raise Exception(f"내용 추출 실패: {e}")
+        self.content = content
 
     def summarize_job_posting(self, content: str, verbose: bool = False) -> str:
         """채용공고 내용 요약 (토큰 제한 자동 처리)"""
@@ -201,17 +143,18 @@ def main():
     try:
         # 요약기 초기화
         print("🔧 시스템 초기화 중...")
-        summarizer = JobPostingSummarizer(
-            model_name=args.model, temperature=args.temperature
-        )
+        webparser = WebParser(url=url)
 
         # 내용 추출
         print("📄 채용공고 내용 추출 중...")
-        content = summarizer.extract_content_from_url(url)
+        content = webparser.extract_content_from_url()
         print(f"✅ 내용 추출 완료 (길이: {len(content)} 글자)")
 
         # 요약 수행
         print("🤖 AI 요약 처리 중... (시간이 조금 걸릴 수 있습니다)")
+        summarizer = JobPostingSummarizer(
+            content=content, model_name=args.model, temperature=args.temperature
+        )
         summary = summarizer.summarize_job_posting(content, verbose=args.verbose)
         summary = f"{summary}  \n[채용공고]({url})"
 

@@ -92,7 +92,7 @@ class JobSummaryChain:
                 # 직접 처리 가능
                 if verbose:
                     print("직접 처리 실행")
-                return self.summary_chain.invoke({"input": cleaned_content})
+                return self.summary_chain.invoke(input=cleaned_content)
             else:
                 # Map-Reduce 처리 필요
                 if verbose:

@@ -14,12 +14,12 @@ import customtkinter as ctk
 import requests
 from bs4 import BeautifulSoup
 
-from .chain import JobSummaryChain, SkillGapChain
-from .config_manager import ConfigManager
-from .discord_sender import SimpleDiscordSender
-from .email_sender import SimpleEmailSender
-from .github_analyzer import GitHubAnalyzer
-from .user_manager import UserManager
+from ..core.chain import JobSummaryChain, SkillGapChain
+from ..utils.config_manager import ConfigManager
+from ..services.discord_sender import SimpleDiscordSender
+from ..services.email_sender import SimpleEmailSender
+from ..services.github_analyzer import GitHubAnalyzer
+from ..utils.user_manager import UserManager
 
 
 class MainWindow(ctk.CTk):

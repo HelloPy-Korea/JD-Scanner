@@ -8,7 +8,7 @@ from typing import Callable, Optional
 
 import customtkinter as ctk
 
-from .config_manager import ConfigManager
+from ..utils.config_manager import ConfigManager
 
 
 class SettingsWindow(ctk.CTk):

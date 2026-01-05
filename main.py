@@ -6,9 +6,9 @@ GUI 진입점
 
 import sys
 
-from src.config_manager import ConfigManager
-from src.main_ui import MainWindow
-from src.settings_ui import SettingsWindow
+from src.utils.config_manager import ConfigManager
+from src.ui.main_ui import MainWindow
+from src.ui.settings_ui import SettingsWindow
 
 
 def launch_main_window():

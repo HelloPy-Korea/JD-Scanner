@@ -44,23 +44,37 @@ AI 기반 채용공고 분석 및 면접 준비 시스템입니다. 채용공고
 
 ```
 JD-Scanner/
-├── main.py                 # 메인 진입점
-├── pyproject.toml          # 프로젝트 메타데이터
-├── makefile                # 설치/실행 자동화
-├── .env                    # 환경설정
+├── main.py                     # GUI 진입점
+├── pyproject.toml              # 프로젝트 메타데이터
+├── makefile                    # 설치/실행 자동화
+├── .env                        # 환경설정
 ├── src/
-│   ├── __init__.py         # 패키지 초기화
-│   ├── chain.py            # LangChain 체인 (요약 + 스킬갭)
-│   ├── lang_prompt.py      # 프롬프트 설정
-│   ├── lang_template.py    # 프롬프트 템플릿
-│   ├── discord_sender.py   # Discord 메시지 전송
-│   ├── email_sender.py     # 이메일 발송
-│   ├── github_analyzer.py  # GitHub 프로필 분석
-│   └── user_manager.py     # 사용자 정보 관리
+│   ├── __init__.py             # 패키지 초기화
+│   ├── ui/                     # UI 레이어 (Presentation)
+│   │   ├── __init__.py
+│   │   ├── main_ui.py          # 메인 분석 화면
+│   │   └── settings_ui.py      # 설정 화면
+│   ├── core/                   # Core 레이어 (Domain)
+│   │   ├── __init__.py
+│   │   ├── chain.py            # LangChain 체인 (요약 + 스킬갭)
+│   │   ├── mapreduce_chain.py  # Map-Reduce 대용량 처리
+│   │   ├── lang_prompt.py      # 프롬프트 설정
+│   │   └── lang_template.py    # 프롬프트 템플릿
+│   ├── services/               # Services 레이어 (Infrastructure)
+│   │   ├── __init__.py
+│   │   ├── discord_sender.py   # Discord 메시지 전송
+│   │   ├── email_sender.py     # 이메일 발송
+│   │   └── github_analyzer.py  # GitHub 프로필 분석
+│   └── utils/                  # Utils 레이어 (Shared)
+│       ├── __init__.py
+│       ├── config_manager.py   # 환경변수 관리
+│       ├── user_manager.py     # 사용자 정보 관리
+│       ├── token_counter.py    # 토큰 카운터
+│       └── text_splitter.py    # 텍스트 청킹
 ├── output/
-│   ├── users/              # 사용자 데이터 저장
-│   └── *.md                # 분석 결과 파일
-└── test/                   # 테스트 파일
+│   ├── users/                  # 사용자 데이터 저장
+│   └── *.md                    # 분석 결과 파일
+└── test/                       # 테스트 파일
 ```
 
 ## 설치 및 실행
@@ -187,15 +201,86 @@ GitHub 프로필 URL을 입력하세요: https://github.com/username
 
 ## 모듈 설명
 
+### 레이어 구조
+
+| 레이어 | 역할 | 의존 가능 |
+|--------|------|-----------|
+| `ui/` | 사용자 인터페이스 | core, services, utils |
+| `core/` | 핵심 비즈니스 로직 | utils |
+| `services/` | 외부 서비스 연동 | utils |
+| `utils/` | 공통 유틸리티 | 없음 |
+
+### 주요 모듈
+
 | 모듈 | 설명 |
 |------|------|
-| `main.py` | 메인 실행 로직, 전체 플로우 관리 |
-| `src/chain.py` | JobSummaryChain, SkillGapChain |
-| `src/lang_template.py` | 요약/스킬갭/면접질문 템플릿 |
-| `src/github_analyzer.py` | GitHub API 연동, 프로필 분석 |
-| `src/user_manager.py` | 사용자 정보 수집 및 저장 |
-| `src/email_sender.py` | Gmail SMTP 이메일 발송 |
-| `src/discord_sender.py` | Discord 메시지 전송 |
+| `main.py` | GUI 진입점, 설정 확인 후 윈도우 실행 |
+| `src/ui/main_ui.py` | 메인 분석 화면, 분석 파이프라인 실행 |
+| `src/ui/settings_ui.py` | 설정 화면 (Discord, Email, GitHub) |
+| `src/core/chain.py` | JobSummaryChain, SkillGapChain |
+| `src/core/mapreduce_chain.py` | 대용량 텍스트 Map-Reduce 처리 |
+| `src/core/lang_template.py` | 요약/스킬갭/면접질문 템플릿 |
+| `src/services/github_analyzer.py` | GitHub API 연동, 프로필 분석 |
+| `src/services/email_sender.py` | Gmail SMTP 이메일 발송 |
+| `src/services/discord_sender.py` | Discord 메시지 전송 |
+| `src/utils/config_manager.py` | .env 환경변수 관리 |
+| `src/utils/user_manager.py` | 사용자 정보 수집 및 저장 |
+
+## 코딩 컨벤션
+
+### 네이밍 규칙
+
+| 구분 | 규칙 | 예시 |
+|------|------|------|
+| 클래스명 | PascalCase | `JobSummaryChain`, `ConfigManager` |
+| 함수/메서드명 | snake_case | `run_summary`, `validate_inputs` |
+| 상수 | UPPER_SNAKE_CASE | `BASE_URL`, `SCHEMA` |
+| private 메서드 | underscore prefix | `_initialize_llm`, `_create_chain` |
+
+### 파일 구조
+
+```python
+"""
+모듈 설명 docstring
+- 주요 기능 1
+- 주요 기능 2
+"""
+
+# 표준 라이브러리
+import os
+import sys
+
+# 서드파티 라이브러리
+from langchain_ollama.llms import OllamaLLM
+
+# 로컬 모듈
+from ..utils.config_manager import ConfigManager
+```
+
+### 타입 힌팅
+
+```python
+from typing import Optional, Dict, List, Literal
+
+def analyze_profile(self, github_url: str) -> Optional[GitHubProfile]:
+    """GitHub 프로필 분석"""
+    ...
+
+def generate_questions(
+    self,
+    language: Literal["ko", "en"] = "ko"
+) -> str:
+    ...
+```
+
+### 레이어 의존성 규칙
+
+```
+ui/ → core/, services/, utils/ (허용)
+core/ → utils/ (허용)
+services/ → utils/ (허용)
+하위 레이어 → 상위 레이어 (금지)
+```
 
 ## 문제 해결
 

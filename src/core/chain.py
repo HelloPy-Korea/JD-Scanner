@@ -14,7 +14,7 @@ from langchain_ollama.llms import OllamaLLM
 
 from .lang_prompt import PromptConfig
 from .mapreduce_chain import MapReduceJobChain
-from .token_counter import SimpleTokenCounter, ContentPreprocessor
+from ..utils.token_counter import SimpleTokenCounter, ContentPreprocessor
 
 
 class JobSummaryChain:

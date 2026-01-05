@@ -8,7 +8,7 @@ import time
 
 from langchain_ollama.llms import OllamaLLM
 
-from .text_splitter import JobPostingSplitter
+from ..utils.text_splitter import JobPostingSplitter
 from .lang_template import JobSummaryTemplate
 
 
